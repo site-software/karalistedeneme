@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kara Liste Yönetimi</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+      padding: 20px;
+      margin: 0;
+      font-family: 'Oswald', sans-serif;
+      background-color: #0f2700; /* Tek renk arka plan */
+      color: #303030;
+    }
+
+    h1 {
+      color: #fff;
+    }
+
+    .container {
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      background-color: #252525; /* Container arka plan rengi */
+    }
+
+    #karaListeForm {
+      margin-bottom: 20px;
+    }
+
+    #sonuc {
+      margin-top: 10px;
+    }
+
+    .btn {
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .btn:hover {
+      transform: scale(1.1);
+      opacity: 0.9;
+    }
+
+    .remove-btn {
+      cursor: pointer;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .remove-btn:hover {
+      transform: scale(1.1);
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="mt-4 mb-4">Kara Liste Yönetimi</h1>
+
+    <form id="karaListeForm" class="form-inline">
+      <div class="form-group mr-2">
+        <label for="isim" class="sr-only">İsim:</label>
+        <input type="text" id="isim" name="isim" class="form-control" placeholder="İsim Soyisim" required>
+      </div>
+      <button type="button" onclick="ekleKaraListe()" class="btn btn-primary">Kara Listeye Ekle</button>
+      <button type="button" onclick="araKaraListe()" class="btn btn-info ml-2">Ara</button>
+    </form>
+
+    <ul id="sonuc" class="list-group mt-2"></ul>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      updateUI();
+    });
+
+    function updateUI() {
+      var karaListe = JSON.parse(localStorage.getItem('karaListe')) || [];
+      var sonucListesi = document.getElementById('sonuc');
+      sonucListesi.innerHTML = '';
+
+      for (var i = 0; i < karaListe.length; i++) {
+        var sonucListItem = document.createElement('li');
+        var isimContainer = document.createElement('span');
+        isimContainer.textContent = karaListe[i];
+        isimContainer.classList.add('mr-2');
+
+        var kaldirDugme = document.createElement('span');
+        kaldirDugme.textContent = 'X';
+        kaldirDugme.classList.add('remove-btn', 'text-danger');
+        kaldirDugme.onclick = function() {
+          karaListeKaldir(this.previousSibling.textContent);
+        };
+
+        sonucListItem.appendChild(isimContainer);
+        sonucListItem.appendChild(kaldirDugme);
+
+        sonucListItem.classList.add('list-group-item');
+        sonucListesi.appendChild(sonucListItem);
+      }
+    }
+
+    function ekleKaraListe() {
+      var isim = document.getElementById('isim').value;
+      
+      if (isim.trim() !== '') {
+        var karaListe = JSON.parse(localStorage.getItem('karaListe')) || [];
+        karaListe.push(isim);
+        localStorage.setItem('karaListe', JSON.stringify(karaListe));
+
+        updateUI();
+      } else {
+        alert('Geçerli bir isim giriniz.');
+      }
+    }
+
+    function araKaraListe() {
+      var aramaKelimesi = document.getElementById('isim').value.toLowerCase();
+      var karaListe = JSON.parse(localStorage.getItem('karaListe')) || [];
+      var sonucListesi = document.getElementById('sonuc');
+      sonucListesi.innerHTML = '';
+
+      for (var i = 0; karaListe.length > 0 && i < karaListe.length; i++) {
+        var isim = karaListe[i].toLowerCase();
+
+        if (isim.includes(aramaKelimesi)) {
+          var sonucListItem = document.createElement('li');
+          var isimContainer = document.createElement('span');
+          isimContainer.textContent = karaListe[i];
+          isimContainer.classList.add('mr-2');
+
+          var kaldirDugme = document.createElement('span');
+          kaldirDugme.textContent = 'X';
+          kaldirDugme.classList.add('remove-btn', 'text-danger');
+          kaldirDugme.onclick = function() {
+            karaListeKaldir(this.previousSibling.textContent);
+          };
+
+          sonucListItem.appendChild(isimContainer);
+          sonucListItem.appendChild(kaldirDugme);
+
+          sonucListItem.classList.add('list-group-item');
+          sonucListesi.appendChild(sonucListItem);
+        }
+      }
+    }
+
+    function karaListeKaldir(isim) {
+      var karaListe = JSON.parse(localStorage.getItem('karaListe')) || [];
+      karaListe = karaListe.filter(function(item) {
+        return item !== isim;
+      });
+      localStorage.setItem('karaListe', JSON.stringify(karaListe));
+
+      alert(isim + ' kara listeden kaldırıldı!');
+
+      updateUI();
+    }
+  </script>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
